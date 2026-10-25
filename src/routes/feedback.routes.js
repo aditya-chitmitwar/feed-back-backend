@@ -36,7 +36,7 @@ router.post(
 
 router.post(
   '/feedback',
-  //authenticateRequest,
+  authenticateRequest,
   normalizeFeedbackBody,
   [
     body('name')
