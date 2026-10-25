@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { authenticateRequest, issueToken } = require('../middleware/auth');
 const { createFeedbackRecord } = require('../services/airtable.service');
+const { sendFeedbackToN8n } = require('../services/webhook.service');
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ router.post(
 
 router.post(
   '/feedback',
-  authenticateRequest,
+  //authenticateRequest,
   normalizeFeedbackBody,
   [
     body('name')
@@ -77,6 +78,13 @@ router.post(
         feedback,
       });
 
+      const webhookResult = await sendFeedbackToN8n({
+        source: 'feedback-api',
+        name,
+        email,
+        feedback,
+      });
+
       return res.status(201).json({
         success: true,
         message: 'Feedback submitted successfully.',
@@ -86,11 +94,15 @@ router.post(
           email,
           feedback,
         },
+        webhook: {
+          sent: webhookResult.sent,
+          message: webhookResult.message,
+        },
       });
     } catch (error) {
       return res.status(500).json({
         success: false,
-        message: 'Failed to save feedback to Airtable.',
+        message: 'Failed to save feedback to Airtable or send to n8n webhook.',
         error: process.env.NODE_ENV === 'development' ? error.message : undefined,
       });
     }

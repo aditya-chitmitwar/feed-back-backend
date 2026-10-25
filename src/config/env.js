@@ -9,4 +9,5 @@ module.exports = {
   AIRTABLE_BASE_ID: process.env.AIRTABLE_BASE_ID || '',
   AIRTABLE_TABLE_NAME: process.env.AIRTABLE_TABLE_NAME || 'Feedback',
   CLIENT_URL: process.env.CLIENT_URL || '*',
+  N8N_WEBHOOK_URL: process.env.N8N_WEBHOOK_URL || '',
 };
